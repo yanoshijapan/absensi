@@ -404,10 +404,24 @@
         </div>
         
         <div class="menu-section" id="nav-logged-in">
-            <h2>Menu</h2>
-            <p><strong>Profil</strong>: Fitur ganti foto dan password belum diimplementasikan.</p>
-            <p><strong>Team</strong>: Fitur daftar anggota belum diimplementasikan.</p>
-            <button class="btn btn-secondary" id="logout-btn" style="margin-top: 20px;">Logout</button>
+            <div class="menu-item">
+                <h3>Profil</h3>
+                <div class="input-group">
+                    <label for="new-password">Ubah Password</label>
+                    <input type="password" id="new-password" placeholder="Password baru">
+                </div>
+                <button class="btn" id="change-password-btn" style="width: auto; padding: 10px 15px;">Simpan Password</button>
+                <p style="margin-top: 10px; font-size: 0.8em;">(Fitur ganti foto profil memerlukan Firebase Storage dan lebih kompleks untuk diimplementasikan di 1 file).</p>
+            </div>
+            <hr style="margin: 20px 0;">
+            <div class="menu-item">
+                <h3>Team</h3>
+                <div id="team-list-container" style="max-height: 200px; overflow-y: auto;">
+                    </div>
+                <button class="btn btn-secondary" id="load-team-btn" style="width: auto; padding: 10px 15px; margin-top: 10px;">Muat Ulang Daftar Tim</button>
+            </div>
+        
+            <button class="btn btn-secondary" id="logout-btn" style="margin-top: auto;">Logout</button>
         </div>
     </nav>
 
@@ -503,6 +517,7 @@
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
     <script>
         // !!! PASTE YOUR FIREBASE CONFIG OBJECT HERE !!!
@@ -519,6 +534,7 @@
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
+        const db = firebase.firestore();
 
         // !!! PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE !!!
         const GAS_URL = 'https://script.google.com/macros/s/AKfycbycvTinrmBhh2iQJPcOnkemfT_YzxkWjMUXTFCQOtAcaD6SmObvsvUbvioC2PKy4Z-iYQ/exec';
@@ -575,9 +591,25 @@
         document.getElementById('signup-btn').addEventListener('click', () => {
             const email = document.getElementById('signup-email').value;
             const password = document.getElementById('signup-password').value;
+            const whatsapp = document.getElementById('signup-wa').value;
+        
+            if (!email || !password || !whatsapp) {
+                alert("Harap isi semua kolom.");
+                return;
+            }
+        
             showLoader();
             auth.createUserWithEmailAndPassword(email, password)
                 .then(userCredential => {
+                    // Pengguna berhasil dibuat, sekarang simpan info ke Firestore
+                    const user = userCredential.user;
+                    return db.collection('users').doc(user.uid).set({
+                        email: email,
+                        whatsapp: whatsapp,
+                        name: email.split('@')[0] // Nama default dari email
+                    });
+                })
+                .then(() => {
                     hideLoader();
                     showPopup('Pendaftaran berhasil! Silakan login.');
                     showView('login-view');
@@ -613,6 +645,73 @@
         });
 
 
+        document.getElementById('change-password-btn').addEventListener('click', () => {
+            const newPassword = document.getElementById('new-password').value;
+            if (newPassword.length < 6) {
+                alert("Password baru harus minimal 6 karakter.");
+                return;
+            }
+        
+            showLoader();
+            const user = auth.currentUser;
+            user.updatePassword(newPassword).then(() => {
+                hideLoader();
+                document.getElementById('new-password').value = ''; // Kosongkan input
+                alert("Password berhasil diubah!");
+                closeMenu();
+            }).catch((error) => {
+                hideLoader();
+                alert("Gagal mengubah password: " + error.message);
+                // Jika error karena perlu re-login, arahkan pengguna untuk logout dan login kembali
+                if (error.code === 'auth/requires-recent-login') {
+                    alert("Sesi Anda sudah terlalu lama. Harap logout dan login kembali untuk mengubah password.");
+                }
+            });
+        });
+        
+        // Muat Daftar Tim dari Firestore
+        const loadTeamBtn = document.getElementById('load-team-btn');
+        const teamListContainer = document.getElementById('team-list-container');
+        
+        async function fetchAndDisplayTeam() {
+            teamListContainer.innerHTML = 'Memuat...'; // Tampilkan pesan loading
+            try {
+                const snapshot = await db.collection('users').get();
+                if (snapshot.empty) {
+                    teamListContainer.innerHTML = 'Belum ada anggota tim.';
+                    return;
+                }
+        
+                let teamHTML = '';
+                snapshot.forEach(doc => {
+                    const member = doc.data();
+                    teamHTML += `
+                        <div style="padding: 10px; border-bottom: 1px solid #eee;">
+                            <strong>${member.name}</strong><br>
+                            <small style="color: #666;">${member.email}</small><br>
+                            <small style="color: #666;">WA: ${member.whatsapp}</small>
+                        </div>
+                    `;
+                });
+                teamListContainer.innerHTML = teamHTML;
+        
+            } catch (error) {
+                console.error("Error fetching team: ", error);
+                teamListContainer.innerHTML = 'Gagal memuat daftar tim.';
+            }
+        }
+        
+        // Tambahkan event listener untuk memuat data saat tombol diklik atau saat menu dibuka
+        loadTeamBtn.addEventListener('click', fetchAndDisplayTeam);
+        
+        // Panggil fetchAndDisplayTeam saat pengguna login dan membuka menu
+        hamburgerBtn.addEventListener('click', () => {
+            if (navMenu.classList.contains('open') && currentUser) {
+                // Jika menu akan terbuka dan pengguna sudah login, muat data tim
+                fetchAndDisplayTeam();
+            }
+        });
+        
         // --- MAIN APP FEATURES ---
         let clockInterval;
         function startClock() {
