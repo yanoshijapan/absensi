@@ -160,14 +160,40 @@
         async function fetchInitialData(uid) {
             showLoader();
             try {
-                const userDocPromise = db.collection('users').doc(uid).get();
-                const teamQueryPromise = db.collection('users').orderBy('name').get();
-                const [userDoc, teamSnapshot] = await Promise.all([userDocPromise, teamQueryPromise]);
-                if (userDoc.exists) { currentUserData = userDoc.data(); }
-                teamData = []; teamSnapshot.forEach(doc => { teamData.push(doc.data()); });
+                const userDocRef = db.collection('users').doc(uid);
+                const userDoc = await userDocRef.get();
+        
+                // --- INI BAGIAN PENTINGNYA ---
+                if (!userDoc.exists) {
+                    // Jika dokumen tidak ada, buat dokumen dasar untuk pengguna ini.
+                    console.log(`Dokumen untuk user ${uid} tidak ditemukan, membuat yang baru...`);
+                    const basicUserData = {
+                        uid: currentUser.uid,
+                        email: currentUser.email,
+                        name: currentUser.email.split('@')[0], // Nama default
+                        whatsapp: '' // WA bisa diisi nanti
+                    };
+                    await userDocRef.set(basicUserData);
+                    currentUserData = basicUserData; // Langsung gunakan data baru ini
+                } else {
+                    currentUserData = userDoc.data();
+                }
+                // --- AKHIR DARI BAGIAN PENTING ---
+        
+                // Ambil data tim seperti biasa
+                const teamSnapshot = await db.collection('users').orderBy('name').get();
+                teamData = [];
+                teamSnapshot.forEach(doc => {
+                    teamData.push(doc.data());
+                });
+        
                 updateUserProfileUI();
-            } catch (error) { console.error("Error fetching initial data:", error); alert("Gagal memuat data awal.");
-            } finally { hideLoader(); }
+            } catch (error) {
+                console.error("Error fetching initial data:", error);
+                alert("Gagal memuat data awal.");
+            } finally {
+                hideLoader();
+            }
         }
         
         function updateUserProfileUI() {
@@ -227,7 +253,9 @@
                 const result = await response.json();
                 if (result.error) throw new Error(result.error.message);
                 const photoURL = result.secure_url;
-                await db.collection('users').doc(currentUser.uid).update({ profilePhotoURL: photoURL });
+                await db.collection('users').doc(currentUser.uid).set({
+                    profilePhotoURL: photoURL
+                }, { merge: true });
                 document.getElementById('user-photo').src = photoURL;
                 document.getElementById('menu-user-photo').src = photoURL;
                 if (currentUserData) currentUserData.profilePhotoURL = photoURL;
