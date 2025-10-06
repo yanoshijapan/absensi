@@ -90,6 +90,10 @@
             </div>
             <div class="input-group"><label for="username-input">Set Username</label><input type="text" id="username-input" placeholder="Masukkan username baru"></div>
             <button class="btn" id="save-username-btn" style="width: auto; padding: 10px 15px; font-size: 1em; margin-bottom: 20px;">Simpan Username</button>
+            
+            <div class="input-group"><label for="whatsapp-input">Update Nomor WhatsApp</label><input type="tel" id="whatsapp-input" placeholder="08xxxxxxxxxx"></div>
+            <button class="btn" id="save-whatsapp-btn" style="width: auto; padding: 10px 15px; font-size: 1em; margin-bottom: 20px;">Simpan Nomor</button>
+
             <div class="input-group"><label for="new-password">Ubah Password</label><input type="password" id="new-password" placeholder="Password baru"></div>
             <button class="btn" id="change-password-btn" style="width: auto; padding: 10px 15px;">Simpan Password</button>
             <hr style="margin: 20px 0;">
@@ -215,6 +219,25 @@
                 showPopup("Username berhasil diperbarui!");
             } catch (error) { hideLoader(); console.error("Error updating username:", error); alert("Gagal memperbarui username: " + error.message); }
         });
+        
+        // FUNGSI BARU: Simpan Nomor WhatsApp
+        document.getElementById('save-whatsapp-btn').addEventListener('click', async () => {
+            const newWhatsapp = document.getElementById('whatsapp-input').value;
+            if (!newWhatsapp || newWhatsapp.length < 9) return alert("Nomor WhatsApp tidak valid.");
+            if (!currentUser) return;
+            showLoader();
+            try {
+                await db.collection('users').doc(currentUser.uid).update({ whatsapp: newWhatsapp });
+                if (currentUserData) currentUserData.whatsapp = newWhatsapp;
+                
+                // Update juga data di array teamData agar langsung tercermin di list
+                const userInTeamList = teamData.find(member => member.uid === currentUser.uid);
+                if (userInTeamList) userInTeamList.whatsapp = newWhatsapp;
+
+                hideLoader();
+                showPopup("Nomor WhatsApp berhasil diperbarui!");
+            } catch (error) { hideLoader(); console.error("Error updating WhatsApp:", error); alert("Gagal memperbarui nomor: " + error.message); }
+        });
 
         document.getElementById('change-password-btn').addEventListener('click', () => {
             const newPassword = document.getElementById('new-password').value;
@@ -311,8 +334,9 @@
             const isOpening = !navMenu.classList.contains('open');
             hamburgerBtn.classList.toggle('open'); navMenu.classList.toggle('open');
             if (isOpening && currentUser) {
-                if (currentUserData && currentUserData.name) {
-                    document.getElementById('username-input').value = currentUserData.name;
+                if (currentUserData) {
+                    document.getElementById('username-input').value = currentUserData.name || '';
+                    document.getElementById('whatsapp-input').value = currentUserData.whatsapp || '';
                 }
                 displayTeam();
             }
