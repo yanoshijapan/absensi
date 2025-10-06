@@ -18,8 +18,7 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .popup-wrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 10000; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; }
         .popup-wrapper.show { opacity: 1; visibility: visible; }
-        .popup-box { background-color: var(--surface-color); padding: 30px 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); text-align: center; transform: scale(0.9); transition: transform 0.3s; }
-        .popup-wrapper.show .popup-box { transform: scale(1); }
+        .popup-box { background-color: var(--surface-color); padding: 30px 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); text-align: center; transform: scale(0.9); transition: transform 0.3s; max-width: 90%; }
         .popup-box h3 { margin-bottom: 20px; font-size: 1.5em; }
         .popup-box button { background-color: var(--primary-color); color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-size: 1em; transition: background-color 0.3s; }
         .popup-box button:hover { background-color: #0056b3; }
@@ -97,38 +96,12 @@
         <div class="view" id="izin-view"><div class="form-container"><h2>Formulir Pengajuan Izin</h2><div class="input-group"><label for="alasan-izin">Alasan Izin</label><textarea id="alasan-izin" rows="5"></textarea></div><button class="btn" id="submit-izin-btn">Ajukan Izin</button><button class="btn btn-secondary" style="margin-top: 10px;" onclick="showView('main-app-view')">Batal</button></div></div>
     </main>
 
-    <div class="overlay-view" id="profile-settings-view">
-        <div class="form-container" style="max-width: 500px; width: 90%;">
-             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 style="margin: 0;">Atur Profil</h2>
-                <button id="close-profile-settings-btn" style="background: none; border: none; font-size: 2rem; cursor: pointer;">&times;</button>
-            </div>
-            <div class="profile-photo-section" style="text-align: center; margin-bottom: 20px;">
-                <img src="https://i.ibb.co/606BFx1/user-placeholder.png" id="menu-user-photo" alt="Foto Profil" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; border: 3px solid var(--primary-color);">
-                <input type="file" id="photo-uploader" accept="image/*" style="display: none;">
-                <button class="btn btn-secondary" id="change-photo-btn" style="width: auto; padding: 8px 15px; font-size: 0.9em;">Ubah Foto</button>
-            </div>
-            <div class="input-group"><label for="username-input">Set Username</label><input type="text" id="username-input" placeholder="Masukkan username baru"></div>
-            <button class="btn" id="save-username-btn" style="width: auto; padding: 10px 15px; font-size: 1em; margin-bottom: 20px;">Simpan Username</button>
-            <div class="input-group"><label for="whatsapp-input">Update Nomor WhatsApp</label><input type="tel" id="whatsapp-input" placeholder="08xxxxxxxxxx"></div>
-            <button class="btn" id="save-whatsapp-btn" style="width: auto; padding: 10px 15px; font-size: 1em; margin-bottom: 20px;">Simpan Nomor</button>
-            <div class="input-group"><label for="new-password">Ubah Password</label><input type="password" id="new-password" placeholder="Password baru"></div>
-            <button class="btn" id="change-password-btn" style="width: auto; padding: 10px 15px;">Simpan Password</button>
-        </div>
-    </div>
-    <div class="overlay-view" id="team-list-view">
-         <div class="form-container" style="max-width: 500px; width: 90%;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 style="margin: 0;">Daftar Tim</h2>
-                <button id="close-team-list-btn" style="background: none; border: none; font-size: 2rem; cursor: pointer;">&times;</button>
-            </div>
-            <div id="team-list-container" style="max-height: 70vh; overflow-y: auto;"></div>
-        </div>
-    </div>
+    <div class="overlay-view" id="profile-settings-view"><div class="form-container" style="max-width: 500px; width: 90%;"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;"><h2 style="margin: 0;">Atur Profil</h2><button id="close-profile-settings-btn" style="background: none; border: none; font-size: 2rem; cursor: pointer;">&times;</button></div><div class="profile-photo-section" style="text-align: center; margin-bottom: 20px;"><img src="https://i.postimg.cc/SNkBCtS3/user-placeholder.png" id="menu-user-photo" alt="Foto Profil" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; border: 3px solid var(--primary-color);"><input type="file" id="photo-uploader" accept="image/*" style="display: none;"><button class="btn btn-secondary" id="change-photo-btn" style="width: auto; padding: 8px 15px; font-size: 0.9em;">Ubah Foto</button></div><div class="input-group"><label for="username-input">Set Username</label><input type="text" id="username-input" placeholder="Masukkan username baru"></div><button class="btn" id="save-username-btn" style="width: auto; padding: 10px 15px; font-size: 1em; margin-bottom: 20px;">Simpan Username</button><div class="input-group"><label for="whatsapp-input">Update Nomor WhatsApp</label><input type="tel" id="whatsapp-input" placeholder="08xxxxxxxxxx"></div><button class="btn" id="save-whatsapp-btn" style="width: auto; padding: 10px 15px; font-size: 1em; margin-bottom: 20px;">Simpan Nomor</button><div class="input-group"><label for="new-password">Ubah Password</label><input type="password" id="new-password" placeholder="Password baru"></div><button class="btn" id="change-password-btn" style="width: auto; padding: 10px 15px;">Simpan Password</button></div></div>
+    <div class="overlay-view" id="team-list-view"><div class="form-container" style="max-width: 500px; width: 90%;"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;"><h2 style="margin: 0;">Daftar Tim</h2><button id="close-team-list-btn" style="background: none; border: none; font-size: 2rem; cursor: pointer;">&times;</button></div><div id="team-list-container" style="max-height: 70vh; overflow-y: auto;"></div></div></div>
     <div class="overlay-view" id="camera-view"><div id="camera-overlay">Posisikan wajah Anda</div><video id="video-preview" autoplay playsinline></video><canvas id="canvas" style="display:none;"></canvas><button id="capture-btn"></button><button id="cancel-camera-btn">X</button></div>
     
     <div class="loader-wrapper" id="loader"><div class="loader"></div></div>
-    <div class="popup-wrapper" id="popup"><div class="popup-box"><h3 id="popup-message">Aksi Berhasil</h3><button id="close-popup-btn">Tutup</button></div></div>
+    <div class="popup-wrapper" id="popup"><div class="popup-box"><h3 id="popup-message">Aksi Berhasil</h3><button id="close-popup-btn">Tutup</button><button id="retry-btn" class="btn-secondary" style="margin-left: 10px; display: none;">Coba Lagi</button></div></div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
@@ -155,7 +128,7 @@
 
         const allViews = document.querySelectorAll('.view, .overlay-view');
         const loader = document.getElementById('loader');
-        let currentUser = null, currentUserData = null, teamData = null, clockInterval;
+        let currentUser = null, currentUserData = null, teamData = null, clockInterval, lastFailedRequest = null;
 
         function showView(viewId) { 
             allViews.forEach(view => {
@@ -170,8 +143,16 @@
         }
         function showLoader() { loader.classList.add('show'); }
         function hideLoader() { loader.classList.remove('show'); }
-        function showPopup(message) { document.getElementById('popup-message').textContent = message; document.getElementById('popup').classList.add('show'); }
-        document.getElementById('close-popup-btn').addEventListener('click', () => { document.getElementById('popup').classList.remove('show'); showView('main-app-view'); });
+        function showPopup(message, isError = false) {
+            document.getElementById('popup-message').textContent = message;
+            const retryBtn = document.getElementById('retry-btn');
+            retryBtn.style.display = isError ? 'inline-block' : 'none';
+            document.getElementById('popup').classList.add('show');
+        }
+        document.getElementById('close-popup-btn').addEventListener('click', () => { document.getElementById('popup').classList.remove('show'); });
+        document.getElementById('retry-btn').addEventListener('click', () => {
+            if (lastFailedRequest) { document.getElementById('popup').classList.remove('show'); handleFetch(lastFailedRequest.url, lastFailedRequest.options, lastFailedRequest.successMessage); }
+        });
 
         auth.onAuthStateChanged(user => {
             if (user) {
@@ -207,7 +188,7 @@
         }
         
         function updateUserProfileUI() {
-            const mainPhoto = document.getElementById('user-photo'), menuPhoto = document.getElementById('menu-user-photo'), placeholder = 'https://i.ibb.co/606BFx1/user-placeholder.png';
+            const mainPhoto = document.getElementById('user-photo'), menuPhoto = document.getElementById('menu-user-photo'), placeholder = 'https://i.postimg.cc/SNkBCtS3/user-placeholder.png';
             if (currentUserData && currentUserData.name) { document.getElementById('user-name').textContent = currentUserData.name; } 
             else if (currentUser) { document.getElementById('user-name').textContent = currentUser.email; }
             const photoUrl = currentUserData && currentUserData.profilePhotoURL ? currentUserData.profilePhotoURL : placeholder;
@@ -243,8 +224,7 @@
                 await db.collection('users').doc(currentUser.uid).update({ name: newUsername });
                 if (currentUserData) currentUserData.name = newUsername;
                 updateUserProfileUI();
-                hideLoader();
-                showPopup("Username berhasil diperbarui!");
+                hideLoader(); showPopup("Username berhasil diperbarui!");
             } catch (error) { hideLoader(); console.error("Error updating username:", error); alert("Gagal memperbarui username: " + error.message); }
         });
         
@@ -258,8 +238,7 @@
                 if (currentUserData) currentUserData.whatsapp = newWhatsapp;
                 const userInTeamList = teamData.find(member => member.uid === currentUser.uid);
                 if (userInTeamList) userInTeamList.whatsapp = newWhatsapp;
-                hideLoader();
-                showPopup("Nomor WhatsApp berhasil diperbarui!");
+                hideLoader(); showPopup("Nomor WhatsApp berhasil diperbarui!");
             } catch (error) { hideLoader(); console.error("Error updating WhatsApp:", error); alert("Gagal memperbarui nomor: " + error.message); }
         });
 
@@ -281,23 +260,6 @@
             if (file && file.type.startsWith('image/')) uploadProfilePhoto(file); else if(file) alert('Harap pilih file gambar.');
         });
         
-        async function uploadProfilePhoto(file) {
-            if (!currentUser) return;
-            showLoader();
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-            try {
-                const response = await fetch(CLOUDINARY_URL, { method: 'POST', body: formData });
-                const result = await response.json();
-                if (result.error) throw new Error(result.error.message);
-                const photoURL = result.secure_url;
-                await db.collection('users').doc(currentUser.uid).set({ profilePhotoURL: photoURL }, { merge: true });
-                updateUserProfileUI();
-                hideLoader(); showPopup('Foto profil berhasil diperbarui!');
-            } catch (error) { hideLoader(); console.error("Error uploading to Cloudinary:", error); alert('Gagal mengunggah foto: ' + error.message); }
-        }
-
         function displayTeam() {
             const container = document.getElementById('team-list-container');
             if (!teamData || teamData.length === 0) { container.innerHTML = '<em>Belum ada anggota tim.</em>'; return; }
@@ -341,15 +303,40 @@
             submitDataToGAS({ email: currentUser.email, name: (currentUserData && currentUserData.name) || currentUser.email.split('@')[0], type: currentAbsenType, photoData }, "Absen berhasil!");
         });
         
-        function submitDataToGAS(data, successMessage) {
+        async function handleFetch(url, options, successMessage) {
             showLoader();
-            fetch(GAS_URL, { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
-            .then(res => res.json()).then(result => {
+            try {
+                const response = await fetch(url, options);
+                if (!response.ok) throw new Error(`Server merespon dengan status: ${response.status}`);
+                const result = await response.json();
+                if (result.error) throw new Error(result.error.message);
                 hideLoader();
-                if (result.status === 'success') { showPopup(successMessage); } else { alert('Terjadi kesalahan: ' + result.message); }
-            }).catch(error => { hideLoader(); console.error('Error:', error); alert('Gagal mengirim data.'); });
+                showPopup(successMessage);
+                lastFailedRequest = null;
+                return result;
+            } catch (error) {
+                hideLoader();
+                console.error('Fetch Error:', error);
+                lastFailedRequest = { url, options, successMessage };
+                showPopup(`Gagal: ${error.message}. Cek koneksi Anda.`, true);
+            }
         }
-
+        function submitDataToGAS(data, successMessage) {
+            handleFetch(GAS_URL, { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }, successMessage);
+        }
+        async function uploadProfilePhoto(file) {
+            if (!currentUser) return;
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+            const result = await handleFetch(CLOUDINARY_URL, { method: 'POST', body: formData }, 'Foto profil berhasil diperbarui!');
+            if (result && result.secure_url) {
+                const photoURL = result.secure_url;
+                await db.collection('users').doc(currentUser.uid).set({ profilePhotoURL: photoURL }, { merge: true });
+                if(currentUserData) currentUserData.profilePhotoURL = photoURL;
+                updateUserProfileUI();
+            }
+        }
         const hamburgerBtn = document.getElementById('hamburger-btn'), navMenu = document.getElementById('nav-menu'), closeMenuBtn = document.getElementById('close-menu-btn');
         function closeMenu() { hamburgerBtn.classList.remove('open'); navMenu.classList.remove('open'); }
         hamburgerBtn.addEventListener('click', () => { hamburgerBtn.classList.toggle('open'); navMenu.classList.toggle('open'); });
@@ -359,7 +346,6 @@
             const isClickInsideMenu = navMenu.contains(event.target), isClickOnHamburger = hamburgerBtn.contains(event.target);
             if (!isClickInsideMenu && !isClickOnHamburger) closeMenu();
         });
-
         document.getElementById('open-profile-settings-btn').addEventListener('click', () => {
             if (currentUserData) {
                 document.getElementById('username-input').value = currentUserData.name || '';
