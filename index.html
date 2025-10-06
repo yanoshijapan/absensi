@@ -173,7 +173,6 @@
             box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
             transition: right 0.4s ease-in-out;
             z-index: 1001;
-            padding-top: var(--header-height);
             display: flex;
             flex-direction: column;
             padding: 20px;
@@ -185,6 +184,7 @@
         .nav-menu .menu-section {
             display: none;
             flex-direction: column;
+            height: 100%;
         }
         .nav-menu .menu-section.active {
             display: flex;
@@ -235,15 +235,16 @@
             margin-bottom: 8px;
             font-weight: 600;
         }
-        .input-group input {
+        .input-group input, .input-group textarea {
             width: 100%;
             padding: 12px 15px;
             border: 1px solid #ccc;
             border-radius: 8px;
             font-size: 1em;
+            font-family: 'Poppins', sans-serif;
             transition: border-color 0.3s;
         }
-        .input-group input:focus {
+        .input-group input:focus, .input-group textarea:focus {
             outline: none;
             border-color: var(--primary-color);
         }
@@ -343,11 +344,22 @@
             background: black;
             z-index: 1003;
             flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
         #video-preview {
             width: 100%;
             height: 100%;
             object-fit: cover;
+        }
+        #camera-overlay {
+            position: absolute;
+            top: 20px;
+            color: white;
+            background-color: rgba(0,0,0,0.5);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 1.1em;
         }
         #capture-btn, #cancel-camera-btn {
             position: absolute;
@@ -411,16 +423,14 @@
                     <input type="password" id="new-password" placeholder="Password baru">
                 </div>
                 <button class="btn" id="change-password-btn" style="width: auto; padding: 10px 15px;">Simpan Password</button>
-                <p style="margin-top: 10px; font-size: 0.8em;">(Fitur ganti foto profil memerlukan Firebase Storage dan lebih kompleks untuk diimplementasikan di 1 file).</p>
+                <p style="margin-top: 10px; font-size: 0.8em;">(Fitur ganti foto profil memerlukan Firebase Storage).</p>
             </div>
             <hr style="margin: 20px 0;">
             <div class="menu-item">
                 <h3>Team</h3>
-                <div id="team-list-container" style="max-height: 200px; overflow-y: auto;">
+                <div id="team-list-container" style="max-height: 250px; overflow-y: auto;">
                     </div>
-                <button class="btn btn-secondary" id="load-team-btn" style="width: auto; padding: 10px 15px; margin-top: 10px;">Muat Ulang Daftar Tim</button>
             </div>
-        
             <button class="btn btn-secondary" id="logout-btn" style="margin-top: auto;">Logout</button>
         </div>
     </nav>
@@ -448,6 +458,10 @@
         <div class="view" id="signup-view">
             <div class="form-container">
                 <h2>Daftar Akun Baru</h2>
+                 <div class="input-group">
+                    <label for="signup-name">Nama Lengkap</label>
+                    <input type="text" id="signup-name" required>
+                </div>
                 <div class="input-group">
                     <label for="signup-email">Alamat Email</label>
                     <input type="email" id="signup-email" required>
@@ -473,7 +487,7 @@
                 <div class="clock-date" id="clock-date">Tanggal</div>
             </div>
             <div class="user-profile">
-                <img src="https://via.placeholder.com/150" alt="Foto Profil" id="user-photo">
+                <img src="https://i.ibb.co/606BFx1/user-placeholder.png" alt="Foto Profil" id="user-photo">
                 <span class="user-name" id="user-name">Nama Pengguna</span>
             </div>
             <div class="action-buttons">
@@ -488,17 +502,17 @@
                 <h2>Formulir Pengajuan Izin</h2>
                 <div class="input-group">
                     <label for="alasan-izin">Alasan Izin</label>
-                    <textarea id="alasan-izin" rows="5" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-family: 'Poppins', sans-serif;"></textarea>
+                    <textarea id="alasan-izin" rows="5"></textarea>
                 </div>
                 <button class="btn" id="submit-izin-btn">Ajukan Izin</button>
                  <button class="btn btn-secondary" style="margin-top: 10px;" onclick="showView('main-app-view')">Batal</button>
             </div>
         </div>
-
     </main>
     
     <div class="view" id="camera-view">
-        <video id="video-preview" autoplay></video>
+        <div id="camera-overlay">Posisikan wajah Anda</div>
+        <video id="video-preview" autoplay playsinline></video>
         <canvas id="canvas" style="display:none;"></canvas>
         <button id="capture-btn"></button>
         <button id="cancel-camera-btn">X</button>
@@ -514,13 +528,12 @@
         </div>
     </div>
 
-
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
     <script>
-        // !!! PASTE YOUR FIREBASE CONFIG OBJECT HERE !!!
+        // ❗ PENTING: Ganti dengan konfigurasi Firebase Anda
         const firebaseConfig = {
           apiKey: "AIzaSyAL44qnUYBXRb4dONGlvV5LUFvA73z8gVk",
           authDomain: "absensiyanoshi.firebaseapp.com",
@@ -531,29 +544,33 @@
           measurementId: "G-E1LVDFKVGV"
         };
 
+        // ❗ PENTING: Ganti dengan URL Google Apps Script Anda
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbycvTinrmBhh2iQJPcOnkemfT_YzxkWjMUXTFCQOtAcaD6SmObvsvUbvioC2PKy4Z-iYQ/exec';
+        
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // !!! PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE !!!
-        const GAS_URL = 'https://script.google.com/macros/s/AKfycbycvTinrmBhh2iQJPcOnkemfT_YzxkWjMUXTFCQOtAcaD6SmObvsvUbvioC2PKy4Z-iYQ/exec';
-        
         // DOM Elements
         const views = document.querySelectorAll('.view');
         const loader = document.getElementById('loader');
         const popup = document.getElementById('popup');
         const popupMessage = document.getElementById('popup-message');
         const closePopupBtn = document.getElementById('close-popup-btn');
+        const hamburgerBtn = document.getElementById('hamburger-btn');
+        const navMenu = document.getElementById('nav-menu');
         
+        // App State
         let currentUser = null;
+        let currentUserData = null;
+        let teamData = null;
         let currentAbsenType = '';
-        
+        let clockInterval;
+
         // --- VIEW MANAGEMENT ---
         function showView(viewId) {
-            views.forEach(view => {
-                view.classList.remove('active');
-            });
+            views.forEach(view => view.classList.remove('active'));
             document.getElementById(viewId).classList.add('active');
         }
 
@@ -569,44 +586,82 @@
             showView('main-app-view');
         });
 
-        // --- AUTHENTICATION ---
+        // --- AUTHENTICATION & DATA FETCHING ---
         auth.onAuthStateChanged(user => {
             if (user) {
                 currentUser = user;
-                document.getElementById('user-name').textContent = user.email;
-                document.getElementById('nav-logged-out').classList.remove('active');
-                document.getElementById('nav-logged-in').classList.add('active');
-                showView('main-app-view');
-                startClock();
+                fetchInitialData(user.uid).then(() => {
+                    document.getElementById('nav-logged-out').classList.remove('active');
+                    document.getElementById('nav-logged-in').classList.add('active');
+                    showView('main-app-view');
+                    startClock();
+                });
             } else {
                 currentUser = null;
+                currentUserData = null;
+                teamData = null;
                 document.getElementById('nav-logged-in').classList.remove('active');
                 document.getElementById('nav-logged-out').classList.add('active');
                 showView('login-view');
                 stopClock();
             }
         });
+        
+        // Fetch user data and team list ONCE after login for efficiency
+        async function fetchInitialData(uid) {
+            showLoader();
+            try {
+                const userDocPromise = db.collection('users').doc(uid).get();
+                const teamQueryPromise = db.collection('users').orderBy('name').get();
+                
+                const [userDoc, teamSnapshot] = await Promise.all([userDocPromise, teamQueryPromise]);
+
+                if (userDoc.exists) {
+                    currentUserData = userDoc.data();
+                }
+
+                teamData = [];
+                teamSnapshot.forEach(doc => {
+                    teamData.push(doc.data());
+                });
+
+                updateUserProfileUI();
+            } catch (error) {
+                console.error("Error fetching initial data:", error);
+                alert("Gagal memuat data awal. Silakan coba lagi.");
+            } finally {
+                hideLoader();
+            }
+        }
+        
+        function updateUserProfileUI() {
+             if (currentUserData && currentUserData.name) {
+                document.getElementById('user-name').textContent = currentUserData.name;
+            } else if (currentUser) {
+                document.getElementById('user-name').textContent = currentUser.email;
+            }
+        }
 
         // Signup
         document.getElementById('signup-btn').addEventListener('click', () => {
+            const name = document.getElementById('signup-name').value;
             const email = document.getElementById('signup-email').value;
             const password = document.getElementById('signup-password').value;
             const whatsapp = document.getElementById('signup-wa').value;
-        
-            if (!email || !password || !whatsapp) {
-                alert("Harap isi semua kolom.");
-                return;
+
+            if (!name || !email || !password || !whatsapp) {
+                return alert("Harap isi semua kolom.");
             }
-        
+
             showLoader();
             auth.createUserWithEmailAndPassword(email, password)
                 .then(userCredential => {
-                    // Pengguna berhasil dibuat, sekarang simpan info ke Firestore
                     const user = userCredential.user;
                     return db.collection('users').doc(user.uid).set({
+                        uid: user.uid,
+                        name: name,
                         email: email,
                         whatsapp: whatsapp,
-                        name: email.split('@')[0] // Nama default dari email
                     });
                 })
                 .then(() => {
@@ -624,12 +679,11 @@
         const handleLogin = () => {
             const email = document.getElementById('login-email').value || document.getElementById('nav-email').value;
             const password = document.getElementById('login-password').value || document.getElementById('nav-password').value;
+            if (!email || !password) return alert("Email dan password harus diisi.");
+            
             showLoader();
             auth.signInWithEmailAndPassword(email, password)
-                .then(userCredential => {
-                    hideLoader();
-                    closeMenu();
-                })
+                .then(() => closeMenu())
                 .catch(error => {
                     hideLoader();
                     alert(error.message);
@@ -644,85 +698,62 @@
             closeMenu();
         });
 
-
+        // --- MENU FEATURES (PROFIL & TEAM) ---
+        // Change Password
         document.getElementById('change-password-btn').addEventListener('click', () => {
             const newPassword = document.getElementById('new-password').value;
             if (newPassword.length < 6) {
-                alert("Password baru harus minimal 6 karakter.");
-                return;
+                return alert("Password baru harus minimal 6 karakter.");
             }
-        
             showLoader();
-            const user = auth.currentUser;
-            user.updatePassword(newPassword).then(() => {
+            auth.currentUser.updatePassword(newPassword).then(() => {
                 hideLoader();
-                document.getElementById('new-password').value = ''; // Kosongkan input
+                document.getElementById('new-password').value = '';
                 alert("Password berhasil diubah!");
                 closeMenu();
             }).catch((error) => {
                 hideLoader();
                 alert("Gagal mengubah password: " + error.message);
-                // Jika error karena perlu re-login, arahkan pengguna untuk logout dan login kembali
                 if (error.code === 'auth/requires-recent-login') {
                     alert("Sesi Anda sudah terlalu lama. Harap logout dan login kembali untuk mengubah password.");
                 }
             });
         });
-        
-        // Muat Daftar Tim dari Firestore
-        const loadTeamBtn = document.getElementById('load-team-btn');
-        const teamListContainer = document.getElementById('team-list-container');
-        
-        async function fetchAndDisplayTeam() {
-            teamListContainer.innerHTML = 'Memuat...'; // Tampilkan pesan loading
-            try {
-                const snapshot = await db.collection('users').get();
-                if (snapshot.empty) {
-                    teamListContainer.innerHTML = 'Belum ada anggota tim.';
-                    return;
-                }
-        
-                let teamHTML = '';
-                snapshot.forEach(doc => {
-                    const member = doc.data();
-                    teamHTML += `
-                        <div style="padding: 10px; border-bottom: 1px solid #eee;">
-                            <strong>${member.name}</strong><br>
-                            <small style="color: #666;">${member.email}</small><br>
-                            <small style="color: #666;">WA: ${member.whatsapp}</small>
-                        </div>
-                    `;
-                });
-                teamListContainer.innerHTML = teamHTML;
-        
-            } catch (error) {
-                console.error("Error fetching team: ", error);
-                teamListContainer.innerHTML = 'Gagal memuat daftar tim.';
+
+        // Display Team List (data is already fetched)
+        function displayTeam() {
+            const container = document.getElementById('team-list-container');
+            if (!teamData) {
+                container.innerHTML = '<em>Data tim belum dimuat.</em>';
+                return;
             }
+            if (teamData.length === 0) {
+                container.innerHTML = '<em>Belum ada anggota tim.</em>';
+                return;
+            }
+            container.innerHTML = teamData.map(member => `
+                <div style="padding: 10px; border-bottom: 1px solid #eee;">
+                    <strong>${member.name}</strong><br>
+                    <small style="color: #666;">${member.email}</small><br>
+                    <small style="color: #666;">WA: ${member.whatsapp}</small>
+                </div>
+            `).join('');
         }
         
-        // Tambahkan event listener untuk memuat data saat tombol diklik atau saat menu dibuka
-        loadTeamBtn.addEventListener('click', fetchAndDisplayTeam);
-        
-        // Panggil fetchAndDisplayTeam saat pengguna login dan membuka menu
         hamburgerBtn.addEventListener('click', () => {
-            if (navMenu.classList.contains('open') && currentUser) {
-                // Jika menu akan terbuka dan pengguna sudah login, muat data tim
-                fetchAndDisplayTeam();
+            if (!navMenu.classList.contains('open') && currentUser) {
+                displayTeam();
             }
         });
-        
+
         // --- MAIN APP FEATURES ---
-        let clockInterval;
         function startClock() {
             const timeEl = document.getElementById('clock-time');
             const dateEl = document.getElementById('clock-date');
             const updateClock = () => {
                 const now = new Date();
-                const time = now.toLocaleTimeString('id-ID');
-                const date = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-                timeEl.textContent = time;
-                dateEl.textContent = date;
+                timeEl.textContent = now.toLocaleTimeString('id-ID');
+                dateEl.textContent = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
             };
             updateClock();
             clockInterval = setInterval(updateClock, 1000);
@@ -735,13 +766,11 @@
         document.getElementById('izin-btn').addEventListener('click', () => showView('izin-view'));
         document.getElementById('submit-izin-btn').addEventListener('click', () => {
             const reason = document.getElementById('alasan-izin').value;
-            if (!reason) {
-                alert('Alasan izin tidak boleh kosong!');
-                return;
-            }
+            if (!reason) return alert('Alasan izin tidak boleh kosong!');
+            
             const data = {
                 email: currentUser.email,
-                name: currentUser.email.split('@')[0], // Simple name extraction
+                name: (currentUserData && currentUserData.name) || currentUser.email.split('@')[0],
                 type: 'izin',
                 reason: reason
             };
@@ -768,9 +797,7 @@
         }
         
         function stopCamera() {
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-            }
+            if (stream) stream.getTracks().forEach(track => track.stop());
             showView('main-app-view');
         }
 
@@ -787,7 +814,7 @@
             
             const data = {
                 email: currentUser.email,
-                name: currentUser.email.split('@')[0], // Simple name extraction
+                name: (currentUserData && currentUserData.name) || currentUser.email.split('@')[0],
                 type: currentAbsenType,
                 photoData: photoData
             };
@@ -822,8 +849,6 @@
         }
 
         // --- HAMBURGER MENU ---
-        const hamburgerBtn = document.getElementById('hamburger-btn');
-        const navMenu = document.getElementById('nav-menu');
         hamburgerBtn.addEventListener('click', () => {
             hamburgerBtn.classList.toggle('open');
             navMenu.classList.toggle('open');
