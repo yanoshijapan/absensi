@@ -77,11 +77,11 @@
     <nav class="nav-menu" id="nav-menu">
         <button class="close-menu-btn" id="close-menu-btn">&times;</button>
         <div class="menu-section" id="nav-logged-out">
-             <h2>Login</h2>
-             <div class="input-group"><label for="nav-email">Email</label><input type="email" id="nav-email" placeholder="email@anda.com"></div>
-             <div class="input-group"><label for="nav-password">Password</label><input type="password" id="nav-password" placeholder="********"></div>
-             <button class="btn" id="nav-login-btn">Login</button>
-             <div class="switch-link"><a href="#" onclick="showView('signup-view'); closeMenu();">Sign up disini</a></div>
+              <h2>Login</h2>
+              <div class="input-group"><label for="nav-email">Email</label><input type="email" id="nav-email" placeholder="email@anda.com"></div>
+              <div class="input-group"><label for="nav-password">Password</label><input type="password" id="nav-password" placeholder="********"></div>
+              <button class="btn" id="nav-login-btn">Login</button>
+              <div class="switch-link"><a href="#" onclick="showView('signup-view'); closeMenu();">Sign up disini</a></div>
         </div>
         <div class="menu-section" id="nav-logged-in">
             <button class="menu-item-button" id="open-profile-settings-btn">Atur Profil</button>
@@ -117,7 +117,10 @@
           appId: "1:1015425488771:web:4d55ea4a32387286d808b6",
           measurementId: "G-E1LVDFKVGV"
         };
-        const GAS_URL = 'https://script.google.com/macros/s/AKfycbz5okRVFLMR5nBaLvbHW1OiL9KRs31-JqzSrRg8kvxGGBpv5HB5M-1lfvCF_42M5_E5/exec';
+        
+        // PASTE URL WEB APP ANDA DARI GOOGLE SCRIPT DI SINI
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbz5okRVFLMR5nBaLvbHW1OiL9KRs31-JqzSrRg8kvxGGBpv5HB5M-1lfvCF_42M5_E5/exec'; 
+
         const CLOUDINARY_CLOUD_NAME = 'dhsbixafr';
         const CLOUDINARY_UPLOAD_PRESET = 'yanoshi_profile_photo';
         const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
@@ -285,7 +288,7 @@
             submitDataToGAS({ email: currentUser.email, name: (currentUserData && currentUserData.name) || currentUser.email.split('@')[0], type: 'izin', reason }, "Izin berhasil diajukan");
         });
 
-        const video = document.getElementById('video-preview'), canvas = document.getElementById('canvas');
+        const video = document.getElementById('video-preview');
         let stream, currentAbsenType;
         async function startCamera(absenType) {
             currentAbsenType = absenType;
@@ -296,31 +299,73 @@
         document.getElementById('absen-masuk-btn').addEventListener('click', () => startCamera('masuk'));
         document.getElementById('absen-keluar-btn').addEventListener('click', () => startCamera('keluar'));
         document.getElementById('cancel-camera-btn').addEventListener('click', stopCamera);
+        
+        // FUNGSI CAPTURE FOTO YANG DIPERBAIKI
         document.getElementById('capture-btn').addEventListener('click', () => {
-            canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-            const photoData = canvas.toDataURL('image/jpeg'); stopCamera();
-            submitDataToGAS({ email: currentUser.email, name: (currentUserData && currentUserData.name) || currentUser.email.split('@')[0], type: currentAbsenType, photoData }, "Absen berhasil!");
+            const MAX_WIDTH = 800; // Tentukan lebar maksimum gambar (misal 800px)
+            const canvas = document.getElementById('canvas');
+            const video = document.getElementById('video-preview');
+
+            // Sesuaikan ukuran canvas dengan rasio video
+            const aspectRatio = video.videoWidth / video.videoHeight;
+            canvas.width = MAX_WIDTH;
+            canvas.height = MAX_WIDTH / aspectRatio;
+
+            // Gambar video ke canvas dengan ukuran yang sudah diubah
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Ubah ke DataURL dengan kompresi JPEG (kualitas 0.8 dari 1)
+            // Ini akan SANGAT mengurangi ukuran file
+            const photoData = canvas.toDataURL('image/jpeg', 0.8);
+            
+            stopCamera(); // Hentikan kamera setelah foto diambil
+            
+            const dataToSend = { 
+                email: currentUser.email, 
+                name: (currentUserData && currentUserData.name) || currentUser.email.split('@')[0], 
+                type: currentAbsenType, 
+                photoData: photoData // Data foto yang sudah dikecilkan
+            };
+
+            submitDataToGAS(dataToSend, "Absen berhasil!");
         });
         
+        // FUNGSI HANDLEFETCH YANG DIPERBAIKI
         async function handleFetch(url, options, successMessage) {
             showLoader();
             try {
                 const response = await fetch(url, options);
-                if (!response.ok) throw new Error(`Server merespon dengan status: ${response.status}`);
+                // Coba baca respons sebagai JSON, tidak peduli sukses atau gagal
                 const result = await response.json();
-                if (result.error) throw new Error(result.error.message);
+
+                if (!response.ok) {
+                    // Jika server merespon dengan status error (4xx, 5xx)
+                    // Kita coba ambil pesan error dari body JSON
+                    const errorMessage = result.error ? result.error.message : `Server merespon dengan status: ${response.status}`;
+                    throw new Error(errorMessage);
+                }
+                
+                if (result.status === 'error') {
+                     // Jika server merespon 200 OK tapi logikanya error
+                     const errorMessage = result.error ? result.error.message : "Terjadi error yang tidak diketahui di backend.";
+                     throw new Error(errorMessage);
+                }
+                
                 hideLoader();
                 showPopup(successMessage);
                 lastFailedRequest = null;
                 return result;
+
             } catch (error) {
                 hideLoader();
                 console.error('Fetch Error:', error);
                 lastFailedRequest = { url, options, successMessage };
+                // Tampilkan pesan error yang lebih spesifik
                 showPopup(`Gagal: ${error.message}. Cek koneksi Anda.`, true);
             }
         }
+
         function submitDataToGAS(data, successMessage) {
             handleFetch(GAS_URL, { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }, successMessage);
         }
