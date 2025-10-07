@@ -191,7 +191,7 @@
         }
         
         function updateUserProfileUI() {
-            const mainPhoto = document.getElementById('user-photo'), menuPhoto = document.getElementById('menu-user-photo'), placeholder = 'https://i.postimg.cc/SNkBCtS3/user-placeholder.png';
+            const mainPhoto = document.getElementById('user-photo'), menuPhoto = document.getElementById('menu-user-photo'), placeholder = 'https://res.cloudinary.com/dhsbixafr/image/upload/v1759200611/vecteezy_user-avatar-line-style__lt14z4.jpg';
             if (currentUserData && currentUserData.name) { document.getElementById('user-name').textContent = currentUserData.name; } 
             else if (currentUser) { document.getElementById('user-name').textContent = currentUser.email; }
             const photoUrl = currentUserData && currentUserData.profilePhotoURL ? currentUserData.profilePhotoURL : placeholder;
