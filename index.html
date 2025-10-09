@@ -61,12 +61,6 @@
         .action-buttons .btn { padding: 20px; font-size: 1.2em; }
         .izin-btn { width: 100%; }
         .overlay-view { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--background-color); z-index: 1003; display: none; flex-direction: column; justify-content: center; align-items: center; overflow-y: auto; }
-        #camera-view { background: black; }
-        #video-preview { width: 100%; height: 100%; object-fit: cover; }
-        #camera-overlay { position: absolute; top: 20px; color: white; background-color: rgba(0,0,0,0.5); padding: 10px; border-radius: 8px; font-size: 1.1em; }
-        #capture-btn, #cancel-camera-btn { position: absolute; bottom: 30px; border: 4px solid white; border-radius: 50%; width: 70px; height: 70px; cursor: pointer; background-color: rgba(255,255,255,0.3); }
-        #capture-btn { left: 50%; transform: translateX(-50%); }
-        #cancel-camera-btn { left: 30px; width: 50px; height: 50px; font-size: 1.5em; color: white; background: transparent; border: 2px solid white; }
     </style>
 </head>
 <body>
@@ -77,11 +71,11 @@
     <nav class="nav-menu" id="nav-menu">
         <button class="close-menu-btn" id="close-menu-btn">&times;</button>
         <div class="menu-section" id="nav-logged-out">
-             <h2>Login</h2>
-             <div class="input-group"><label for="nav-email">Email</label><input type="email" id="nav-email" placeholder="email@anda.com"></div>
-             <div class="input-group"><label for="nav-password">Password</label><input type="password" id="nav-password" placeholder="********"></div>
-             <button class="btn" id="nav-login-btn">Login</button>
-             <div class="switch-link"><a href="#" onclick="showView('signup-view'); closeMenu();">Sign up disini</a></div>
+            <h2>Login</h2>
+            <div class="input-group"><label for="nav-email">Email</label><input type="email" id="nav-email" placeholder="email@anda.com"></div>
+            <div class="input-group"><label for="nav-password">Password</label><input type="password" id="nav-password" placeholder="********"></div>
+            <button class="btn" id="nav-login-btn">Login</button>
+            <div class="switch-link"><a href="#" onclick="showView('signup-view'); closeMenu();">Sign up disini</a></div>
         </div>
         <div class="menu-section" id="nav-logged-in">
             <button class="menu-item-button" id="open-profile-settings-btn">Atur Profil</button>
@@ -92,13 +86,12 @@
     <main>
         <div class="view active" id="login-view"><div class="form-container"><h2>Log In Akun</h2><div class="input-group"><label for="login-email">Alamat Email</label><input type="email" id="login-email" required></div><div class="input-group"><label for="login-password">Password</label><input type="password" id="login-password" required></div><button class="btn" id="login-btn">Login</button><div class="switch-link">Belum punya akun? <a href="#" onclick="showView('signup-view')">Sign up disini</a></div></div></div>
         <div class="view" id="signup-view"><div class="form-container"><h2>Daftar Akun Baru</h2><div class="input-group"><label for="signup-name">Nama Lengkap/Username</label><input type="text" id="signup-name" required></div><div class="input-group"><label for="signup-email">Alamat Email</label><input type="email" id="signup-email" required></div><div class="input-group"><label for="signup-wa">Nomor WhatsApp</label><input type="tel" id="signup-wa" required></div><div class="input-group"><label for="signup-password">Password</label><input type="password" id="signup-password" required></div><button class="btn" id="signup-btn">Sign Up</button><div class="switch-link">Sudah punya akun? <a href="#" onclick="showView('login-view')">Login disini</a></div></div></div>
-        <div class="view" id="main-app-view"><div class="clock-widget"><div class="clock-time" id="clock-time">00:00:00</div><div class="clock-date" id="clock-date">Tanggal</div></div><div class="user-profile"><img src="https://i.ibb.co/606BFx1/user-placeholder.png" alt="Foto Profil" id="user-photo"><span class="user-name" id="user-name">Nama Pengguna</span></div><div class="action-buttons"><button class="btn" id="absen-masuk-btn">Absen Masuk</button><button class="btn btn-secondary" id="absen-keluar-btn">Absen Keluar</button></div><button class="btn izin-btn" id="izin-btn">Ajukan Izin</button></div>
+        <div class="view" id="main-app-view"><div class="clock-widget"><div class="clock-time" id="clock-time">00:00:00</div><div class="clock-date" id="clock-date">Selasa, 7 Oktober 2025</div></div><div class="user-profile"><img src="https://i.ibb.co/606BFx1/user-placeholder.png" alt="Foto Profil" id="user-photo"><span class="user-name" id="user-name">Nama Pengguna</span></div><div class="action-buttons"><button class="btn" id="absen-masuk-btn">Absen Masuk</button><button class="btn btn-secondary" id="absen-keluar-btn">Absen Keluar</button></div><button class="btn izin-btn" id="izin-btn">Ajukan Izin</button></div>
         <div class="view" id="izin-view"><div class="form-container"><h2>Formulir Pengajuan Izin</h2><div class="input-group"><label for="alasan-izin">Alasan Izin</label><textarea id="alasan-izin" rows="5"></textarea></div><button class="btn" id="submit-izin-btn">Ajukan Izin</button><button class="btn btn-secondary" style="margin-top: 10px;" onclick="showView('main-app-view')">Batal</button></div></div>
     </main>
 
     <div class="overlay-view" id="profile-settings-view"><div class="form-container" style="max-width: 500px; width: 90%;"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;"><h2 style="margin: 0;">Atur Profil</h2><button id="close-profile-settings-btn" style="background: none; border: none; font-size: 2rem; cursor: pointer;">&times;</button></div><div class="profile-photo-section" style="text-align: center; margin-bottom: 20px;"><img src="https://i.postimg.cc/SNkBCtS3/user-placeholder.png" id="menu-user-photo" alt="Foto Profil" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; border: 3px solid var(--primary-color);"><input type="file" id="photo-uploader" accept="image/*" style="display: none;"><button class="btn btn-secondary" id="change-photo-btn" style="width: auto; padding: 8px 15px; font-size: 0.9em;">Ubah Foto</button></div><div class="input-group"><label for="username-input">Set Username</label><input type="text" id="username-input" placeholder="Masukkan username baru"></div><button class="btn" id="save-username-btn" style="width: auto; padding: 10px 15px; font-size: 1em; margin-bottom: 20px;">Simpan Username</button><div class="input-group"><label for="whatsapp-input">Update Nomor WhatsApp</label><input type="tel" id="whatsapp-input" placeholder="08xxxxxxxxxx"></div><button class="btn" id="save-whatsapp-btn" style="width: auto; padding: 10px 15px; font-size: 1em; margin-bottom: 20px;">Simpan Nomor</button><div class="input-group"><label for="new-password">Ubah Password</label><input type="password" id="new-password" placeholder="Password baru"></div><button class="btn" id="change-password-btn" style="width: auto; padding: 10px 15px;">Simpan Password</button></div></div>
     <div class="overlay-view" id="team-list-view"><div class="form-container" style="max-width: 500px; width: 90%;"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;"><h2 style="margin: 0;">Daftar Tim</h2><button id="close-team-list-btn" style="background: none; border: none; font-size: 2rem; cursor: pointer;">&times;</button></div><div id="team-list-container" style="max-height: 70vh; overflow-y: auto;"></div></div></div>
-    <div class="overlay-view" id="camera-view"><div id="camera-overlay">Posisikan wajah Anda</div><video id="video-preview" autoplay playsinline></video><canvas id="canvas" style="display:none;"></canvas><button id="capture-btn"></button><button id="cancel-camera-btn">X</button></div>
     
     <div class="loader-wrapper" id="loader"><div class="loader"></div></div>
     <div class="popup-wrapper" id="popup"><div class="popup-box"><h3 id="popup-message">Aksi Berhasil</h3><button id="close-popup-btn">Tutup</button><button id="retry-btn" class="btn-secondary" style="margin-left: 10px; display: none;">Coba Lagi</button></div></div>
@@ -117,7 +110,10 @@
           appId: "1:1015425488771:web:4d55ea4a32387286d808b6",
           measurementId: "G-E1LVDFKVGV"
         };
-        const GAS_URL = 'https://script.google.com/macros/s/AKfycbzywIcB1kKmE8H9vaQbtn4-hbkIvklvl7RiNcE453B6jXDX-ivN4xLy4UhZfMAjl8wAtg/exec';
+        
+        // PASTIKAN URL INI MASIH SAMA DENGAN URL DEPLOYMENT ANDA
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbzywIcB1kKmE8H9vaQbtn4-hbkIvklvl7RiNcE453B6jXDX-ivN4xLy4UhZfMAjl8wAtg/exec'; 
+
         const CLOUDINARY_CLOUD_NAME = 'dhsbixafr';
         const CLOUDINARY_UPLOAD_PRESET = 'yanoshi_profile_photo';
         const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
@@ -285,35 +281,47 @@
             submitDataToGAS({ email: currentUser.email, name: (currentUserData && currentUserData.name) || currentUser.email.split('@')[0], type: 'izin', reason }, "Izin berhasil diajukan");
         });
 
-        const video = document.getElementById('video-preview'), canvas = document.getElementById('canvas');
-        let stream, currentAbsenType;
-        async function startCamera(absenType) {
-            currentAbsenType = absenType;
-            try { stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false }); video.srcObject = stream; showView('camera-view');
-            } catch (err) { console.error("Error accessing camera: ", err); alert('Tidak bisa mengakses kamera.'); }
+        // =========================================================================
+        // FUNGSI UNTUK ABSEN TANPA FOTO (TIDAK PERLU DIUBAH)
+        // =========================================================================
+        function handleAbsenWithoutPhoto(absenType) {
+            if (!currentUser || !currentUserData) {
+                return alert("Data pengguna tidak ditemukan. Silakan coba login ulang.");
+            }
+            const dataToSend = { 
+                email: currentUser.email, 
+                name: currentUserData.name || currentUser.email.split('@')[0], 
+                type: absenType
+            };
+            const successMessage = `Absen ${absenType} berhasil direkam!`;
+            submitDataToGAS(dataToSend, successMessage);
         }
-        function stopCamera() { if (stream) stream.getTracks().forEach(track => track.stop()); showView('main-app-view'); }
-        document.getElementById('absen-masuk-btn').addEventListener('click', () => startCamera('masuk'));
-        document.getElementById('absen-keluar-btn').addEventListener('click', () => startCamera('keluar'));
-        document.getElementById('cancel-camera-btn').addEventListener('click', stopCamera);
-        document.getElementById('capture-btn').addEventListener('click', () => {
-            canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-            const photoData = canvas.toDataURL('image/jpeg'); stopCamera();
-            submitDataToGAS({ email: currentUser.email, name: (currentUserData && currentUserData.name) || currentUser.email.split('@')[0], type: currentAbsenType, photoData }, "Absen berhasil!");
-        });
-        
+
+        document.getElementById('absen-masuk-btn').addEventListener('click', () => handleAbsenWithoutPhoto('masuk'));
+        document.getElementById('absen-keluar-btn').addEventListener('click', () => handleAbsenWithoutPhoto('keluar'));
+        // =========================================================================
+
         async function handleFetch(url, options, successMessage) {
             showLoader();
             try {
                 const response = await fetch(url, options);
-                if (!response.ok) throw new Error(`Server merespon dengan status: ${response.status}`);
                 const result = await response.json();
-                if (result.error) throw new Error(result.error.message);
+
+                if (!response.ok) {
+                    const errorMessage = result.error ? result.error.message : `Server merespon dengan status: ${response.status}`;
+                    throw new Error(errorMessage);
+                }
+                
+                if (result.status === 'error') {
+                    const errorMessage = result.error ? result.error.message : "Terjadi error yang tidak diketahui di backend.";
+                    throw new Error(errorMessage);
+                }
+                
                 hideLoader();
                 showPopup(successMessage);
                 lastFailedRequest = null;
                 return result;
+
             } catch (error) {
                 hideLoader();
                 console.error('Fetch Error:', error);
@@ -321,6 +329,7 @@
                 showPopup(`Gagal: ${error.message}. Cek koneksi Anda.`, true);
             }
         }
+
         function submitDataToGAS(data, successMessage) {
             handleFetch(GAS_URL, { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }, successMessage);
         }
